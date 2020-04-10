@@ -1,11 +1,18 @@
 #!/bin/bash
-# Title: init-git.sh
+# Title: new-repo.sh
 # Author: Michael Martin
 # Desc: Script to quickly setup a git repo
 
-project=$1
-comment=${2:- "Initialized $project"}
-echo "Initializing and pushing to repo $project"
+
+project=${1:- "project"}
+comment=${2:- "Added content"}
+
+
+mkdir $project;
+cd $project;
+echo "# $project" > README.md
+echo "./.*" > .gitignore;
+touch LICENSE.md 
 
 git init;
 git add .

@@ -13,6 +13,4 @@ printf ".vagrant\n.gitignore" > $project/.gitignore
 
 vagrant init $box;
 
-git init 
-git add .
-git commit -m "Initialized $project $box"
+bash /usr/local/bin/init-git.sh
