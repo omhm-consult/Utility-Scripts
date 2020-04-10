@@ -17,6 +17,6 @@ touch LICENSE.md
 git init;
 git add .
 git commit -m "$comment"
-git remote add origin git@github.com:omhm-consults/$project.git
+git remote add origin git@github.com:omhm-consult/$project.git
 git push -u origin master
 
