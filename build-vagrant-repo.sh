@@ -11,6 +11,8 @@ mkdir $project
 printf "# vagrant-$project" > $project/README.md
 printf ".vagrant\n.gitignore" > $project/.gitignore
 
+
+cd $project;
 vagrant init $box;
 
 git init 

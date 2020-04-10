@@ -1,1 +1,0 @@
-# vagrant-kali-linux
