@@ -19,6 +19,7 @@ var walk = function(dir, done) {
             next();
           });
         } else {
+          formatData(file);
           results.push(file);
           next();
         }
@@ -84,22 +85,15 @@ function formatData(data){
 }
 
 function getData(dirpath){
-    let data = walk(dirpath, function(err, results) {
+    let data =  walk(dirpath, function(err, results) {
         if (err) throw err;
         console.log(results);
         return results
       });
-      /*
+  
     console.log(data)
-    let data = []
-    for (let name of dirpath){
-
-        let data_format = formatData(name)
-        data.push(data_format)
-    }
-    return data
-    */
 }
+
 let dirpath = './'
 let regex = / \(.*\)/
 
