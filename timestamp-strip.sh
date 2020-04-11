@@ -3,4 +3,13 @@
 # Author: Michael Martin
 # Desc: Strip timestamps from filenames
 
-rename -n 's/ /$1.txt/' *_*.txt
+files=$(ls)
+
+echo Files are ....
+echo
+echo $files
+
+printf "\n----------------\nNow removing timestamp\n----------------\n\n"
+
+
+

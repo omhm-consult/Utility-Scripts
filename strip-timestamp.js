@@ -1,16 +1,41 @@
 // strip-timestamp.js
 
-var fs = require("fs");
+var fs = require('fs');
+var path = require('path');
+
+var walk = function(dir, done) {
+  var results = [];
+  fs.readdir(dir, function(err, list) {
+    if (err) return done(err);
+    var i = 0;
+    (function next() {
+      var file = list[i++];
+      if (!file) return done(null, results);
+      file = path.resolve(dir, file);
+      fs.stat(file, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file, function(err, res) {
+            results = results.concat(res);
+            next();
+          });
+        } else {
+          results.push(file);
+          next();
+        }
+      });
+    })();
+  });
+};
 
 
 
-function getTimestamp(line){
-    return line.match(/ \(.*\)/)
+function getTimestamp(line, regex){
+    return line.match(regex)
 }
 
 function getNewfilename(line){
 
-    line = line.split(/ \(.*\)/)
+    line = line.split(regex)
     return line[0]+line[1]
 
 }
@@ -20,32 +45,63 @@ function getLines(text_file){
     dirty_data = text.split('\n')
     return dirty_data
 }
+function copyFile(source, target) {
+    var rd = fs.createReadStream(source);
+    var wr = fs.createWriteStream(target);
+    return new Promise(function(resolve, reject) {
+      rd.on('error', reject);
+      wr.on('error', reject);
+      wr.on('finish', resolve);
+      rd.pipe(wr);
+    }).catch(function(error) {
+      rd.destroy();
+      wr.end();
+      throw error;
+    });
+  }
 
-var text_file = "strip.txt"
 
+function formatData(data){
+    var data_format = {
+        "new_filename": "",
+        "old_filename": "",
+        "old_filedata": ""
+    } 
+    data_format.old_filename = data
 
+    data_format.new_filename = getNewfilename(data)
+    //console.log(data_format.new_filename)
+    data_format.old_filedata = getTimestamp(data)
+    copyFile(data_format.old_filename, data_format.new_filename)
 
-function getData(filenames){
- 
+    try {
+        fs.unlinkSync(data_format.old_filename)
+        //file removed
+    } catch(err) {
+        console.error(err)
+    }
+    return data_format
+}
+
+function getData(dirpath){
+    let data = walk(dirpath, function(err, results) {
+        if (err) throw err;
+        console.log(results);
+        return results
+      });
+      /*
+    console.log(data)
     let data = []
-    for (let name of filenames){
+    for (let name of dirpath){
 
-        var data_format = {
-            "new_filename": "",
-            "old_filedata": ""
-        } 
-        data_format.new_filename = getNewfilename(name)
-        //console.log(data_format.new_filename)
-        data_format.old_filedata = getTimestamp(name)
+        let data_format = formatData(name)
         data.push(data_format)
     }
     return data
+    */
 }
+let dirpath = './'
+let regex = / \(.*\)/
 
-let filenames = getLines(text_file)
-console.log(filenames)
-
-let data = getData(filenames)
-console.log(data)
-
-
+let data = getData(dirpath)
+//console.log(data)
