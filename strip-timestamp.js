@@ -3,30 +3,6 @@
 var fs = require('fs');
 var path = require('path');
 
-var walk = function(dir, done) {
-  var results = [];
-  fs.readdir(dir, function(err, list) {
-    if (err) return done(err);
-    var i = 0;
-    (function next() {
-      var file = list[i++];
-      if (!file) return done(null, results);
-      file = path.resolve(dir, file);
-      fs.stat(file, function(err, stat) {
-        if (stat && stat.isDirectory()) {
-          walk(file, function(err, res) {
-            results = results.concat(res);
-            next();
-          });
-        } else {
-          formatData(file);
-          results.push(file);
-          next();
-        }
-      });
-    })();
-  });
-};
 
 
 
@@ -59,7 +35,7 @@ function copyFile(source, target) {
       wr.end();
       throw error;
     });
-  }
+}
 
 
 function formatData(data){
@@ -73,16 +49,46 @@ function formatData(data){
     data_format.new_filename = getNewfilename(data)
     //console.log(data_format.new_filename)
     data_format.old_filedata = getTimestamp(data)
-    copyFile(data_format.old_filename, data_format.new_filename)
+    let new_name = data_format.new_filename
+    copyFile(data_format.old_filename, )
 
+    // Delete Files
+    /*
     try {
         fs.unlinkSync(data_format.old_filename)
         //file removed
     } catch(err) {
         console.error(err)
     }
+    */
     return data_format
 }
+
+
+var walk = function(dir, done) {
+  var results = [];
+  fs.readdir(dir, function(err, list) {
+    if (err) return done(err);
+    var i = 0;
+    (function next() {
+      var file = list[i++];
+      if (!file) return done(null, results);
+      file = path.resolve(dir, file);
+      fs.stat(file, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file, function(err, res) {
+            results = results.concat(res);
+            next();
+          });
+        } else {
+          formatData(file);
+          results.push(file);
+          next();
+        }
+      });
+    })();
+  });
+};
 
 function getData(dirpath){
     let data =  walk(dirpath, function(err, results) {
@@ -95,6 +101,7 @@ function getData(dirpath){
 }
 
 let dirpath = './'
+let project_path
 let regex = / \(.*\)/
 
 let data = getData(dirpath)
